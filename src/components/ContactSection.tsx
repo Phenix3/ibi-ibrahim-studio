@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Language, ProfileData } from '../types';
+import { gsap } from '../utils/gsapSetup';
 import { 
   Mail, 
   Phone, 
@@ -28,6 +29,49 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile, lang })
   });
   const [copiedField, setCopiedField] = useState<string | null>(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Header reveal
+      gsap.from('.contact-header', {
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 85%',
+        },
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out'
+      });
+
+      // Left column reveal
+      gsap.from('.contact-info-col', {
+        scrollTrigger: {
+          trigger: '.contact-info-col',
+          start: 'top 85%',
+        },
+        x: -30,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out'
+      });
+
+      // Right form reveal
+      gsap.from('.contact-form-col', {
+        scrollTrigger: {
+          trigger: '.contact-form-col',
+          start: 'top 85%',
+        },
+        x: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out'
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -50,11 +94,11 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile, lang })
   };
 
   return (
-    <section id="contact" className="py-20 lg:py-28 relative border-b border-[#222] bg-[#0E0E0E]">
+    <section ref={containerRef} id="contact" className="py-20 lg:py-28 relative border-b border-[#222] bg-[#0E0E0E]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-left max-w-3xl mb-14 space-y-3">
+        <div className="contact-header text-left max-w-3xl mb-14 space-y-3">
           <div className="text-xs font-mono font-bold tracking-[0.35em] uppercase text-[#FF4D00]">
             {lang === 'fr' ? '// 06 / CONTACT & COLLABORATION' : '// 06 / GET IN TOUCH'}
           </div>
@@ -73,7 +117,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile, lang })
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           
           {/* Left info & social connections (5 cols) */}
-          <div className="lg:col-span-5 space-y-6 text-left">
+          <div className="contact-info-col lg:col-span-5 space-y-6 text-left">
             
             {/* Quick Contact Box */}
             <div className="p-6 sm:p-8 bg-[#141414] border border-[#222] space-y-6 relative">
@@ -197,7 +241,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ profile, lang })
           </div>
 
           {/* Right contact form (7 cols) */}
-          <div className="lg:col-span-7">
+          <div className="contact-form-col lg:col-span-7">
             <div className="p-6 sm:p-8 bg-[#141414] border border-[#222] text-left space-y-6">
               
               <div className="space-y-1 border-b border-[#222] pb-4">

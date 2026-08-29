@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Language, SkillCategory } from '../types';
 import { skillCategories } from '../data/portfolioData';
+import { gsap } from '../utils/gsapSetup';
 import { 
   Code, 
   Bot, 
@@ -22,6 +23,50 @@ interface SkillsSectionProps {
 export const SkillsSection: React.FC<SkillsSectionProps> = ({ lang }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Header reveal
+      gsap.from('.skills-header', {
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 85%',
+        },
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out'
+      });
+
+      // Filter bar reveal
+      gsap.from('.skills-filter-bar', {
+        scrollTrigger: {
+          trigger: '.skills-filter-bar',
+          start: 'top 85%',
+        },
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power3.out'
+      });
+
+      // Cards stagger animation
+      gsap.from('.skill-category-card', {
+        scrollTrigger: {
+          trigger: '.skills-cards-grid',
+          start: 'top 85%',
+        },
+        y: 35,
+        opacity: 0,
+        stagger: 0.08,
+        duration: 0.7,
+        ease: 'power3.out'
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
 
   const getCategoryIcon = (iconName: string) => {
     switch (iconName) {
@@ -51,11 +96,11 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ lang }) => {
   });
 
   return (
-    <section id="skills" className="py-20 lg:py-28 relative border-b border-[#222] bg-[#0E0E0E]">
+    <section ref={containerRef} id="skills" className="py-20 lg:py-28 relative border-b border-[#222] bg-[#0E0E0E]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-left max-w-3xl mb-14 space-y-3">
+        <div className="skills-header text-left max-w-3xl mb-14 space-y-3">
           <div className="text-xs font-mono font-bold tracking-[0.35em] uppercase text-[#FF4D00]">
             {lang === 'fr' ? '// 02 / STACK TECHNIQUE & SPÉCIALISATIONS' : '// 02 / TECH STACK & ENGINEERING'}
           </div>
@@ -72,7 +117,7 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ lang }) => {
         </div>
 
         {/* Filter & Search Bar */}
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 mb-10 font-mono">
+        <div className="skills-filter-bar flex flex-col md:flex-row items-center justify-between gap-4 mb-10 font-mono">
           
           {/* Category Tabs */}
           <div className="flex items-center gap-1.5 overflow-x-auto w-full md:w-auto pb-2 md:pb-0 scrollbar-none">
@@ -125,11 +170,11 @@ export const SkillsSection: React.FC<SkillsSectionProps> = ({ lang }) => {
         </div>
 
         {/* Skill Category Cards Grid in Artistic Flair styling */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="skills-cards-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredCategories.map((category, cIdx) => (
             <div
               key={category.id}
-              className="bg-[#141414] border border-[#222] hover:border-[#FF4D00] transition-all p-6 text-left flex flex-col justify-between group relative hover:bg-[#181818]"
+              className="skill-category-card bg-[#141414] border border-[#222] hover:border-[#FF4D00] transition-all p-6 text-left flex flex-col justify-between group relative hover:bg-[#181818]"
             >
               {/* Corner mark */}
               <div className="w-4 h-4 border-b border-r border-[#333] absolute bottom-3 right-3 group-hover:border-[#FF4D00] transition-colors"></div>

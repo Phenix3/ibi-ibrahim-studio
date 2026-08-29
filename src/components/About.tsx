@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Language, ProfileData } from '../types';
+import { gsap } from '../utils/gsapSetup';
 import { 
   User, 
   Sparkles, 
@@ -27,6 +28,63 @@ interface AboutProps {
 
 export const About: React.FC<AboutProps> = ({ profile, lang }) => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Header reveal
+      gsap.from('.about-header', {
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 85%',
+        },
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out'
+      });
+
+      // Story Card reveal
+      gsap.from('.about-story-card', {
+        scrollTrigger: {
+          trigger: '.about-story-card',
+          start: 'top 80%',
+        },
+        y: 40,
+        opacity: 0,
+        duration: 0.9,
+        ease: 'power3.out'
+      });
+
+      // Strengths Cards Stagger
+      gsap.from('.about-strength-item', {
+        scrollTrigger: {
+          trigger: '.about-strengths-grid',
+          start: 'top 85%',
+        },
+        y: 30,
+        opacity: 0,
+        stagger: 0.1,
+        duration: 0.7,
+        ease: 'power3.out'
+      });
+
+      // Sidebar Cards
+      gsap.from('.about-sidebar-card', {
+        scrollTrigger: {
+          trigger: '.about-sidebar-card',
+          start: 'top 85%',
+        },
+        x: 30,
+        opacity: 0,
+        stagger: 0.15,
+        duration: 0.8,
+        ease: 'power3.out'
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -37,11 +95,11 @@ export const About: React.FC<AboutProps> = ({ profile, lang }) => {
   const strengthIcons = [Target, Users, ShieldCheck, Zap];
 
   return (
-    <section id="about" className="py-20 lg:py-28 relative border-b border-[#222]">
+    <section ref={containerRef} id="about" className="py-20 lg:py-28 relative border-b border-[#222]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-left max-w-3xl mb-14 space-y-3">
+        <div className="about-header text-left max-w-3xl mb-14 space-y-3">
           <div className="text-xs font-mono font-bold tracking-[0.35em] uppercase text-[#FF4D00]">
             {lang === 'fr' ? '// 01 / BIOGRAPHIE & VISION' : '// 01 / BIOGRAPHY & VISION'}
           </div>
@@ -62,7 +120,7 @@ export const About: React.FC<AboutProps> = ({ profile, lang }) => {
           
           {/* Main Story & Agency Background (7 cols) */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="p-6 sm:p-8 bg-[#141414] border border-[#262626] space-y-5 text-[#C0C0C0] leading-relaxed text-left relative">
+            <div className="about-story-card p-6 sm:p-8 bg-[#141414] border border-[#262626] space-y-5 text-[#C0C0C0] leading-relaxed text-left relative">
               <div className="text-[10px] uppercase font-mono tracking-[0.25em] font-bold text-[#FF4D00] flex items-center gap-2">
                 <span>01.1 // STORY & BACKGROUND</span>
               </div>
@@ -102,13 +160,13 @@ export const About: React.FC<AboutProps> = ({ profile, lang }) => {
                 01.2 // CORE METHODOLOGY & STRENGTHS
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="about-strengths-grid grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {profile.strengths[lang].map((strength, index) => {
                   const Icon = strengthIcons[index % strengthIcons.length];
                   return (
                     <div 
                       key={index}
-                      className="p-5 bg-[#141414] border border-[#222] hover:border-[#FF4D00] transition-colors text-left space-y-2 group"
+                      className="about-strength-item p-5 bg-[#141414] border border-[#222] hover:border-[#FF4D00] transition-colors text-left space-y-2 group"
                     >
                       <div className="flex items-center gap-2 text-[#F0F0F0] font-bold text-xs uppercase font-mono tracking-wider">
                         <Icon className="w-4 h-4 text-[#FF4D00]" />
@@ -129,7 +187,7 @@ export const About: React.FC<AboutProps> = ({ profile, lang }) => {
           <div className="lg:col-span-5 space-y-6 font-mono">
             
             {/* Quick Contact & Info Card */}
-            <div className="p-6 bg-[#141414] border border-[#262626] space-y-4 text-left">
+            <div className="about-sidebar-card p-6 bg-[#141414] border border-[#262626] space-y-4 text-left">
               <div className="text-[10px] uppercase tracking-[0.25em] font-bold text-[#FF4D00]">
                 01.3 // DIRECT CHANNELS
               </div>
@@ -179,7 +237,7 @@ export const About: React.FC<AboutProps> = ({ profile, lang }) => {
             </div>
 
             {/* Languages Spoken */}
-            <div className="p-6 bg-[#141414] border border-[#262626] space-y-4 text-left">
+            <div className="about-sidebar-card p-6 bg-[#141414] border border-[#262626] space-y-4 text-left">
               <div className="text-[10px] uppercase tracking-[0.25em] font-bold text-[#FF4D00] flex items-center gap-2">
                 <LangIcon className="w-3.5 h-3.5" />
                 <span>{lang === 'fr' ? '01.4 // LANGUES' : '01.4 // LANGUAGES'}</span>
@@ -198,7 +256,7 @@ export const About: React.FC<AboutProps> = ({ profile, lang }) => {
             </div>
 
             {/* Interests & Passions */}
-            <div className="p-6 bg-[#141414] border border-[#262626] space-y-4 text-left font-sans">
+            <div className="about-sidebar-card p-6 bg-[#141414] border border-[#262626] space-y-4 text-left font-sans">
               <div className="text-[10px] font-mono uppercase tracking-[0.25em] font-bold text-[#FF4D00] flex items-center gap-2">
                 <Heart className="w-3.5 h-3.5" />
                 <span>{lang === 'fr' ? "01.5 // CENTRES D'INTÉRÊT" : '01.5 // INTERESTS & FOCUS'}</span>

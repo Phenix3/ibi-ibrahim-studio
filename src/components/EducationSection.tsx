@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Language } from '../types';
 import { educationData } from '../data/portfolioData';
+import { gsap } from '../utils/gsapSetup';
 import { 
   BookOpen, 
   Trophy, 
@@ -12,6 +13,52 @@ interface EducationSectionProps {
 }
 
 export const EducationSection: React.FC<EducationSectionProps> = ({ lang }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Header reveal
+      gsap.from('.education-header', {
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 85%',
+        },
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out'
+      });
+
+      // Degree cards stagger
+      gsap.from('.education-degree-card', {
+        scrollTrigger: {
+          trigger: '.education-degree-list',
+          start: 'top 85%',
+        },
+        x: -25,
+        opacity: 0,
+        stagger: 0.12,
+        duration: 0.7,
+        ease: 'power3.out'
+      });
+
+      // Honors cards stagger
+      gsap.from('.education-honor-card', {
+        scrollTrigger: {
+          trigger: '.education-honor-list',
+          start: 'top 85%',
+        },
+        x: 25,
+        opacity: 0,
+        stagger: 0.12,
+        duration: 0.7,
+        ease: 'power3.out'
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   const honors = [
     {
       title: {
@@ -46,11 +93,11 @@ export const EducationSection: React.FC<EducationSectionProps> = ({ lang }) => {
   ];
 
   return (
-    <section id="education" className="py-20 lg:py-28 relative border-b border-[#222]">
+    <section ref={containerRef} id="education" className="py-20 lg:py-28 relative border-b border-[#222]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-left max-w-3xl mb-14 space-y-3">
+        <div className="education-header text-left max-w-3xl mb-14 space-y-3">
           <div className="text-xs font-mono font-bold tracking-[0.35em] uppercase text-[#FF4D00]">
             {lang === 'fr' ? '// 05 / FORMATION & DISTINCTIONS' : '// 05 / EDUCATION & HONORS'}
           </div>
@@ -75,11 +122,11 @@ export const EducationSection: React.FC<EducationSectionProps> = ({ lang }) => {
               <span>{lang === 'fr' ? '05.1 // DIPLÔMES UNIVERSITAIRES' : '05.1 // UNIVERSITY DEGREES'}</span>
             </h3>
 
-            <div className="space-y-4">
+            <div className="education-degree-list space-y-4">
               {educationData.map((edu, index) => (
                 <div 
                   key={index}
-                  className="p-6 bg-[#141414] border border-[#222] hover:border-[#FF4D00] transition-all space-y-3 relative group hover:bg-[#181818]"
+                  className="education-degree-card p-6 bg-[#141414] border border-[#222] hover:border-[#FF4D00] transition-all space-y-3 relative group hover:bg-[#181818]"
                 >
                   <div className="flex items-center justify-between font-mono">
                     <span className="px-2.5 py-0.5 text-xs bg-[#0E0E0E] text-[#FF4D00] border border-[#262626] font-bold">
@@ -117,11 +164,11 @@ export const EducationSection: React.FC<EducationSectionProps> = ({ lang }) => {
               <span>{lang === 'fr' ? '05.2 // DISTINCTIONS IA & HACKATHONS' : '05.2 // AI HONORS & HACKATHONS'}</span>
             </h3>
 
-            <div className="space-y-4">
+            <div className="education-honor-list space-y-4">
               {honors.map((honor, index) => (
                 <div 
                   key={index}
-                  className="p-6 bg-[#141414] border border-[#222] hover:border-[#FF4D00] transition-all space-y-2 relative overflow-hidden group hover:bg-[#181818]"
+                  className="education-honor-card p-6 bg-[#141414] border border-[#222] hover:border-[#FF4D00] transition-all space-y-2 relative overflow-hidden group hover:bg-[#181818]"
                 >
                   <div className="w-3 h-3 border-b border-r border-[#333] absolute bottom-2 right-2 group-hover:border-[#FF4D00] transition-colors"></div>
 
@@ -144,7 +191,7 @@ export const EducationSection: React.FC<EducationSectionProps> = ({ lang }) => {
 
                   <div className="pt-2 text-xs font-mono text-[#A0A0A0] flex items-center gap-1.5 border-t border-[#1F1F1F]">
                     <span className="text-[#FF4D00] font-bold">&gt;</span>
-                    <span>Projet : <strong className="text-[#F0F0F0]">{honor.project}</strong></span>
+                    <span>{lang === 'fr' ? 'Projet : ' : 'Project: '}<strong className="text-[#F0F0F0]">{honor.project}</strong></span>
                   </div>
                 </div>
               ))}

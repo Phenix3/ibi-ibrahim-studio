@@ -240,14 +240,22 @@ export const ResumeModal: React.FC<ResumeModalProps> = ({ isOpen, onClose, profi
 
             <div className="space-y-2">
               <h4 className="font-black text-slate-900 uppercase font-mono">{lang === 'fr' ? 'LANGUES' : 'LANGUAGES'}</h4>
-              <div><span className="font-bold">Français :</span> courant</div>
-              <div><span className="font-bold">Anglais :</span> professionnel</div>
+              <div>
+                <span className="font-bold">{lang === 'fr' ? 'Français : ' : 'French: '}</span>
+                <span>{lang === 'fr' ? 'langue maternelle / courant' : 'Native / Fluent'}</span>
+              </div>
+              <div>
+                <span className="font-bold">{lang === 'fr' ? 'Anglais : ' : 'English: '}</span>
+                <span>{lang === 'fr' ? 'professionnel / technique' : 'Full Professional / Technical'}</span>
+              </div>
             </div>
 
             <div className="space-y-2">
               <h4 className="font-black text-slate-900 uppercase font-mono">{lang === 'fr' ? 'ATOUTS' : 'STRENGTHS'}</h4>
               <div className="text-slate-700 leading-tight">
-                Autonomie & initiative, Leadership (fondateur), Rigueur & délais, Résolution de problèmes complexes.
+                {lang === 'fr' 
+                  ? 'Autonomie & initiative, Leadership technique (fondateur d\'agence), Rigueur & respect des délais, Résolution de problèmes complexes.'
+                  : 'Autonomy & initiative, Technical leadership (agency founder), Rigorous deadline execution, Complex architectural problem solving.'}
               </div>
             </div>
           </div>

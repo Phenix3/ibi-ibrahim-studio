@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Language, ProfileData } from '../types';
+import { gsap } from '../utils/gsapSetup';
 import { 
   ArrowRight, 
   MapPin, 
@@ -23,8 +24,46 @@ interface HeroProps {
 }
 
 export const Hero: React.FC<HeroProps> = ({ profile, lang, onOpenResume }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const headlineRef = useRef<HTMLHeadingElement>(null);
+  const leftColRef = useRef<HTMLDivElement>(null);
+  const rightColRef = useRef<HTMLDivElement>(null);
+  const metaBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Staggered Entrance Animation
+      const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+
+      tl.from(metaBarRef.current, {
+        y: -20,
+        opacity: 0,
+        duration: 0.8,
+      })
+      .from(leftColRef.current, {
+        x: -30,
+        opacity: 0,
+        duration: 0.9,
+      }, '-=0.5')
+      .from(rightColRef.current, {
+        x: 30,
+        opacity: 0,
+        duration: 0.9,
+      }, '-=0.7')
+      .from('.hero-metric', {
+        y: 20,
+        opacity: 0,
+        stagger: 0.1,
+        duration: 0.6,
+      }, '-=0.4');
+
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section className="relative pt-28 pb-20 lg:pt-36 lg:pb-28 overflow-hidden border-b border-[#222]">
+    <section ref={containerRef} className="relative pt-28 pb-20 lg:pt-36 lg:pb-28 overflow-hidden border-b border-[#222]">
       {/* Editorial Grid Background */}
       <div 
         className="absolute inset-0 opacity-[0.035] pointer-events-none -z-10" 
@@ -37,7 +76,7 @@ export const Hero: React.FC<HeroProps> = ({ profile, lang, onOpenResume }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Editorial Subheader Meta Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 pb-8 mb-8 border-b border-[#1F1F1F]">
+        <div ref={metaBarRef} className="flex flex-wrap items-center justify-between gap-4 pb-8 mb-8 border-b border-[#1F1F1F]">
           <div className="text-[11px] font-bold tracking-[0.3em] uppercase text-[#F0F0F0] flex items-center gap-3 font-mono">
             <span>PORTFOLIO / VOL. 2.5</span>
             <span className="text-[#444]">//</span>
@@ -60,7 +99,7 @@ export const Hero: React.FC<HeroProps> = ({ profile, lang, onOpenResume }) => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-12 items-start">
           
           {/* Main Hero Content */}
-          <div className="lg:col-span-7 space-y-8 text-left">
+          <div ref={leftColRef} className="lg:col-span-7 space-y-8 text-left">
             
             {/* Main Headline with Corner Bracket Flair */}
             <div className="relative pt-2">
@@ -70,7 +109,7 @@ export const Hero: React.FC<HeroProps> = ({ profile, lang, onOpenResume }) => {
                 {lang === 'fr' ? '// INGÉNIERIE FULL-STACK & SYSTÈMES IA' : '// FULL-STACK & APPLIED AI SYSTEMS'}
               </div>
 
-              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tighter text-[#F0F0F0] font-heading uppercase leading-[0.92]">
+              <h1 ref={headlineRef} className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tighter text-[#F0F0F0] font-heading uppercase leading-[0.92]">
                 ARCHITECTING <br />
                 THE NEXT <span className="text-[#FF4D00]">AI STACK</span>
               </h1>
@@ -155,7 +194,7 @@ export const Hero: React.FC<HeroProps> = ({ profile, lang, onOpenResume }) => {
           </div>
 
           {/* Right Column: Artistic Flair Technical Showcase & Quick Metrics */}
-          <div className="lg:col-span-5 space-y-4">
+          <div ref={rightColRef} className="lg:col-span-5 space-y-4">
             
             {/* Terminal Window Card in Deep Slate & Sharp Grid */}
             <div className="relative border border-[#262626] bg-[#141414] text-left font-mono overflow-hidden">
@@ -236,21 +275,21 @@ export const Hero: React.FC<HeroProps> = ({ profile, lang, onOpenResume }) => {
 
             {/* Quick Metrics Grid in Artistic Flair style */}
             <div className="grid grid-cols-3 gap-2 pt-1 font-mono">
-              <div className="border border-[#222] p-4 bg-[#141414] text-left hover:bg-[#1A1A1A] transition-colors relative">
+              <div className="hero-metric border border-[#222] p-4 bg-[#141414] text-left hover:bg-[#1A1A1A] transition-colors relative">
                 <div className="text-[9px] text-[#666] uppercase tracking-widest font-bold">01 / EXP</div>
                 <div className="text-2xl font-extrabold text-[#F0F0F0] mt-1 font-heading">5+</div>
                 <div className="text-[10px] text-[#888] uppercase mt-0.5">{lang === 'fr' ? 'Années' : 'Years'}</div>
                 <div className="w-3 h-3 border-b border-r border-[#444] absolute bottom-2 right-2"></div>
               </div>
 
-              <div className="border border-[#222] p-4 bg-[#141414] text-left hover:bg-[#1A1A1A] transition-colors relative">
+              <div className="hero-metric border border-[#222] p-4 bg-[#141414] text-left hover:bg-[#1A1A1A] transition-colors relative">
                 <div className="text-[9px] text-[#666] uppercase tracking-widest font-bold">02 / PROJ</div>
                 <div className="text-2xl font-extrabold text-[#FF4D00] mt-1 font-heading">12+</div>
                 <div className="text-[10px] text-[#888] uppercase mt-0.5">{lang === 'fr' ? 'Systèmes' : 'Systems'}</div>
                 <div className="w-3 h-3 border-b border-r border-[#444] absolute bottom-2 right-2"></div>
               </div>
 
-              <div className="border border-[#222] p-4 bg-[#141414] text-left hover:bg-[#1A1A1A] transition-colors relative">
+              <div className="hero-metric border border-[#222] p-4 bg-[#141414] text-left hover:bg-[#1A1A1A] transition-colors relative">
                 <div className="text-[9px] text-[#666] uppercase tracking-widest font-bold">03 / AWARDS</div>
                 <div className="text-2xl font-extrabold text-[#F0F0F0] mt-1 font-heading">02</div>
                 <div className="text-[10px] text-[#888] uppercase mt-0.5">{lang === 'fr' ? 'Prix IA' : 'AI Wins'}</div>

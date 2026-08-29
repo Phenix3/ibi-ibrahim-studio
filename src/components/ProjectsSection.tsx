@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Language, Project } from '../types';
 import { projectsData } from '../data/portfolioData';
 import { ProjectDetailModal } from './ProjectDetailModal';
+import { gsap } from '../utils/gsapSetup';
 import { 
   FolderGit2, 
   Github, 
@@ -20,6 +21,62 @@ interface ProjectsSectionProps {
 export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ lang }) => {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Header reveal
+      gsap.from('.projects-header', {
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 85%',
+        },
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out'
+      });
+
+      // Filter tabs reveal
+      gsap.from('.projects-filter-tabs', {
+        scrollTrigger: {
+          trigger: '.projects-filter-tabs',
+          start: 'top 85%',
+        },
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+        ease: 'power3.out'
+      });
+
+      // Projects grid stagger
+      gsap.from('.project-card-item', {
+        scrollTrigger: {
+          trigger: '.projects-grid-container',
+          start: 'top 85%',
+        },
+        y: 35,
+        opacity: 0,
+        stagger: 0.1,
+        duration: 0.75,
+        ease: 'power3.out'
+      });
+
+      // GitHub callout reveal
+      gsap.from('.projects-github-callout', {
+        scrollTrigger: {
+          trigger: '.projects-github-callout',
+          start: 'top 90%',
+        },
+        y: 25,
+        opacity: 0,
+        duration: 0.7,
+        ease: 'power3.out'
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
 
   const categories = [
     { id: 'all', label: { fr: 'TOUS LES PROJETS', en: 'ALL PROJECTS' } },
@@ -35,11 +92,11 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ lang }) => {
   });
 
   return (
-    <section id="projects" className="py-20 lg:py-28 relative border-b border-[#222]">
+    <section ref={containerRef} id="projects" className="py-20 lg:py-28 relative border-b border-[#222]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-left max-w-3xl mb-14 space-y-3">
+        <div className="projects-header text-left max-w-3xl mb-14 space-y-3">
           <div className="text-xs font-mono font-bold tracking-[0.35em] uppercase text-[#FF4D00]">
             {lang === 'fr' ? '// 03 / PORTFOLIO & SYSTÈMES IA' : '// 03 / SELECTED PORTFOLIO & AI SYSTEMS'}
           </div>
@@ -56,7 +113,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ lang }) => {
         </div>
 
         {/* Filter Category Tabs in Artistic Flair style */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-4 mb-10 font-mono scrollbar-none">
+        <div className="projects-filter-tabs flex items-center gap-1.5 overflow-x-auto pb-4 mb-10 font-mono scrollbar-none">
           {categories.map((cat) => (
             <button
               key={cat.id}
@@ -73,11 +130,11 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ lang }) => {
         </div>
 
         {/* Projects Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="projects-grid-container grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjects.map((project, idx) => (
             <div
               key={project.id}
-              className="bg-[#141414] border border-[#222] hover:border-[#FF4D00] transition-all p-6 flex flex-col justify-between group text-left relative overflow-hidden hover:bg-[#181818]"
+              className="project-card-item bg-[#141414] border border-[#222] hover:border-[#FF4D00] transition-all p-6 flex flex-col justify-between group text-left relative overflow-hidden hover:bg-[#181818]"
             >
               {/* Featured Corner Badge */}
               {project.featured && (
@@ -168,7 +225,7 @@ export const ProjectsSection: React.FC<ProjectsSectionProps> = ({ lang }) => {
         </div>
 
         {/* Global GitHub Callout */}
-        <div className="mt-12 p-6 bg-[#141414] border border-[#262626] flex flex-col sm:flex-row items-center justify-between gap-4 text-left font-mono">
+        <div className="projects-github-callout mt-12 p-6 bg-[#141414] border border-[#262626] flex flex-col sm:flex-row items-center justify-between gap-4 text-left font-mono">
           <div className="space-y-1">
             <div className="text-sm font-bold text-[#F0F0F0] flex items-center gap-2 uppercase tracking-wide">
               <Github className="w-4 h-4 text-[#FF4D00]" />

@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Language } from '../types';
 import { experiencesData } from '../data/portfolioData';
+import { gsap } from '../utils/gsapSetup';
 import { 
   Briefcase, 
   Calendar, 
@@ -14,12 +15,45 @@ interface ExperienceTimelineProps {
 }
 
 export const ExperienceTimeline: React.FC<ExperienceTimelineProps> = ({ lang }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      // Header reveal
+      gsap.from('.experience-header', {
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top 85%',
+        },
+        y: 30,
+        opacity: 0,
+        duration: 0.8,
+        ease: 'power3.out'
+      });
+
+      // Experience cards stagger
+      gsap.from('.experience-card-item', {
+        scrollTrigger: {
+          trigger: '.experience-list-container',
+          start: 'top 85%',
+        },
+        y: 40,
+        opacity: 0,
+        stagger: 0.15,
+        duration: 0.8,
+        ease: 'power3.out'
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section id="experience" className="py-20 lg:py-28 relative border-b border-[#222] bg-[#0E0E0E]">
+    <section ref={containerRef} id="experience" className="py-20 lg:py-28 relative border-b border-[#222] bg-[#0E0E0E]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Section Header */}
-        <div className="text-left max-w-3xl mb-14 space-y-3">
+        <div className="experience-header text-left max-w-3xl mb-14 space-y-3">
           <div className="text-xs font-mono font-bold tracking-[0.35em] uppercase text-[#FF4D00]">
             {lang === 'fr' ? '// 04 / EXPÉRIENCES & TRACK RECORD' : '// 04 / CAREER & TRACK RECORD'}
           </div>
@@ -36,11 +70,11 @@ export const ExperienceTimeline: React.FC<ExperienceTimelineProps> = ({ lang }) 
         </div>
 
         {/* Timeline Layout in Artistic Flair style */}
-        <div className="space-y-6">
+        <div className="experience-list-container space-y-6">
           {experiencesData.map((exp, index) => (
             <div
               key={exp.id}
-              className={`border p-6 sm:p-8 text-left transition-all relative ${
+              className={`experience-card-item border p-6 sm:p-8 text-left transition-all relative ${
                 exp.isCurrent
                   ? 'bg-[#141414] border-[#FF4D00]/60 shadow-lg shadow-black/50'
                   : 'bg-[#141414] border-[#222] hover:border-[#333]'

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Language } from './types';
 import { profileData } from './data/portfolioData';
 import { Navbar } from './components/Navbar';
@@ -13,12 +13,39 @@ import { Footer } from './components/Footer';
 import { ResumeModal } from './components/ResumeModal';
 
 export default function App() {
-  const [lang, setLang] = useState<Language>('fr');
+  const [lang, setLang] = useState<Language>(() => {
+    try {
+      const saved = localStorage.getItem('ibi_portfolio_lang');
+      if (saved === 'en' || saved === 'fr') return saved;
+      const browserLang = navigator.language.toLowerCase();
+      return browserLang.startsWith('fr') ? 'fr' : 'en';
+    } catch {
+      return 'fr';
+    }
+  });
+
   const [isResumeOpen, setIsResumeOpen] = useState<boolean>(false);
 
   const toggleLanguage = () => {
-    setLang(prev => (prev === 'fr' ? 'en' : 'fr'));
+    setLang(prev => {
+      const next = prev === 'fr' ? 'en' : 'fr';
+      try {
+        localStorage.setItem('ibi_portfolio_lang', next);
+      } catch {}
+      return next;
+    });
   };
+
+  const setLanguageDirect = (newLang: Language) => {
+    setLang(newLang);
+    try {
+      localStorage.setItem('ibi_portfolio_lang', newLang);
+    } catch {}
+  };
+
+  useEffect(() => {
+    document.documentElement.lang = lang;
+  }, [lang]);
 
   return (
     <div className="min-h-screen bg-[#0F0F0F] text-[#F0F0F0] font-sans selection:bg-[#FF4D00] selection:text-[#0F0F0F]">
@@ -26,6 +53,7 @@ export default function App() {
       <Navbar
         lang={lang}
         onToggleLang={toggleLanguage}
+        onSetLang={setLanguageDirect}
         onOpenResume={() => setIsResumeOpen(true)}
       />
 
